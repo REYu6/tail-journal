@@ -1,0 +1,263 @@
+.ow-album-filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0;
+}
+.ow-album-filters .ow-filter {
+  margin: 0;
+}
+.ow-album-filters > small,
+.ow-viewer-caption > small {
+  color: #67775f;
+  font-size: 12px;
+}
+.ow-album-grid .ow-card-cover {
+  overflow: hidden;
+}
+.ow-album-grid .ow-card-tag {
+  pointer-events: none;
+}
+.ow-album-lightbox {
+  --ow-forest: #365943;
+  --ow-serif: "Songti SC", "STSong", "Noto Serif CJK SC", Georgia, serif;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #324532;
+  width: min(690px, calc(100vw - 32px));
+  max-width: none;
+  max-height: min(93dvh, 950px);
+  overflow: auto;
+  border-radius: 16px;
+  box-shadow: 0 20px 70px #19271d50;
+  overscroll-behavior: contain;
+}
+.ow-album-lightbox::backdrop {
+  background: rgb(26 37 29 / 0.72);
+}
+.ow-album-paper {
+  background: #fbf8ef;
+  padding: 17px 21px 20px;
+}
+.ow-viewer-heading,
+.ow-viewer-heading > div,
+.ow-viewer-controls,
+.ow-viewer-figure figcaption,
+.ow-viewer-foot,
+.ow-album-receipt {
+  display: flex;
+  align-items: center;
+}
+.ow-viewer-heading {
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.ow-viewer-heading > div {
+  gap: 8px;
+  color: #5b6f54;
+  font-size: 14px;
+}
+.ow-viewer-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #d5dacb;
+  background: #fafbf5;
+  color: #3c5540;
+  border-radius: 50%;
+  padding: 0;
+}
+.ow-viewer-icon:hover {
+  background: #e9eedf;
+}
+.ow-viewer-figure {
+  margin: 0;
+}
+.ow-viewer-stage {
+  display: grid;
+  place-items: center;
+  background: #eeece1;
+  border: 1px solid #deded1;
+  border-radius: 9px;
+  overflow: hidden;
+  touch-action: pan-y pinch-zoom;
+}
+.ow-viewer-art {
+  display: block;
+  width: 100%;
+  height: min(50dvh, 500px);
+  object-fit: contain;
+  user-select: none;
+}
+.ow-viewer-figure figcaption {
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0;
+}
+.ow-viewer-caption {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 3px 10px;
+}
+.ow-viewer-caption > small {
+  grid-column: 1/-1;
+}
+.ow-viewer-caption > h2 {
+  font: 700 clamp(19px, 3.1vw, 27px)/1.3 var(--ow-serif);
+  overflow-wrap: anywhere;
+  color: #314a34;
+  margin: 0;
+}
+.ow-slide-position {
+  color: #68765e;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ow-viewer-controls,
+.ow-viewer-foot {
+  gap: 8px;
+}
+.ow-viewer-foot {
+  border-top: 1px solid #dce1d0;
+  padding-top: 13px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.ow-album-receipt {
+  gap: 8px;
+  background: #eef3e6;
+  color: #36583f;
+  padding: 9px 11px;
+  border-radius: 9px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+.ow-receipt-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  background: #dae6cd;
+  border-radius: 50%;
+}
+.ow-album-receipt strong {
+  font-size: 13px;
+  font-weight: 650;
+}
+.ow-album-receipt .ow-link {
+  margin-left: auto;
+  min-height: 32px;
+}
+@media (max-width: 540px) {
+  .ow-album-paper {
+    padding: 12px 14px 16px;
+  }
+  .ow-viewer-controls {
+    gap: 4px;
+  }
+  .ow-viewer-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .ow-viewer-art {
+    height: min(49dvh, 440px);
+  }
+  .ow-album-filters {
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 5px 10px;
+  }
+  .ow-album-filters > small {
+    align-self: center;
+  }
+  .ow-viewer-caption {
+    gap: 3px 5px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ow-album-grid {
+    animation: album-enter 0.22s ease-out both;
+  }
+  .ow-album-grid .ow-card-cover > img {
+    transition: transform 0.32s ease-out;
+  }
+  .ow-album-grid .ow-pet-card:focus-visible .ow-card-cover > img {
+    transform: scale(1.025);
+  }
+  .ow-album-lightbox[open] {
+    animation: album-enter 0.2s ease-out;
+  }
+  .ow-album-lightbox[open]::backdrop {
+    animation: album-cover 0.2s ease-out;
+  }
+  .ow-viewer-forward {
+    animation: album-page-forward 0.22s ease-out;
+  }
+  .ow-viewer-back {
+    animation: album-page-back 0.22s ease-out;
+  }
+  .ow-album-receipt.just-delivered {
+    animation: album-save 0.55s ease-out;
+  }
+  @media (hover: hover) {
+    .ow-album-grid .ow-pet-card:hover .ow-card-cover > img {
+      transform: scale(1.035);
+    }
+  }
+}
+@keyframes album-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes album-cover {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes album-page-forward {
+  from {
+    opacity: 0.65;
+    transform: translateX(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes album-page-back {
+  from {
+    opacity: 0.65;
+    transform: translateX(-7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes album-save {
+  0% {
+    background: #d9e8ca;
+    transform: translateY(3px);
+  }
+  100% {
+    background: #eef3e6;
+    transform: translateY(0);
+  }
+}

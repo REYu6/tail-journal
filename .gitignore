@@ -1,0 +1,28 @@
+.venv/
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.pytest_cache/
+.runtime/
+data/
+.var/
+.DS_Store
+
+web/public/decoders/
+.ruff_cache/
+
+# Local development tools and workspace metadata
+/.agents/
+/.claude/
+/.zcode/
+/.codex/
+/.cache/
+/skills-lock.json
+
+# Local backups produced by the deployment guide
+pet-data.tar.gz
+*.pgcustom

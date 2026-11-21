@@ -1,0 +1,192 @@
+.proof-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 14px 0 24px;
+  padding: 13px 16px;
+  color: #38533e;
+  background: #edf2e9;
+  border: 1px solid #d4e0d0;
+  border-radius: 12px;
+}
+.proof-progress p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.proof-progress ol {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.proof-progress li,
+.proof-reference {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.proof-progress li {
+  color: #596857;
+}
+.proof-progress li + li::before {
+  width: 18px;
+  height: 1px;
+  margin: 0 4px;
+  background: #aebda8;
+  content: "";
+}
+.proof-progress li i {
+  display: grid;
+  width: 13px;
+  height: 13px;
+  place-items: center;
+  border: 1px solid #a2b19f;
+  border-radius: 50%;
+  color: white;
+}
+.proof-progress li[data-state="done"] i,
+.proof-progress li[data-state="current"] i {
+  border-color: #527454;
+  background: #527454;
+}
+.proof-progress li[data-state="current"] {
+  color: #274c31;
+  font-weight: 650;
+}
+.proof-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.ow-page .proof-toolbar h2 {
+  margin: 0;
+}
+.proof-toolbar p {
+  margin: 4px 0 0;
+  color: #61705f;
+  font-size: 13px;
+}
+.proof-modes {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid #d2d9cc;
+  border-radius: 10px;
+  background: #ecefe7;
+}
+.proof-modes button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 38px;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 7px;
+  color: #556352;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.proof-modes button[aria-pressed="true"] {
+  color: #28482f;
+  background: #fffef9;
+  box-shadow: 0 1px 4px #3c523521;
+}
+.proof-reference {
+  margin: 0 0 12px;
+  color: var(--ow-muted);
+}
+.proof-reference select {
+  max-width: 100%;
+  min-height: 32px;
+  padding: 3px 10px;
+  border: 1px solid var(--ow-line);
+  border-radius: 7px;
+  color: var(--ow-ink);
+  background: var(--ow-white);
+}
+.photo-compare.proof-canvas {
+  height: clamp(275px, 40vw, 440px);
+  aspect-ratio: auto;
+  border: 1px solid #d5d9ce;
+}
+.proof-choices button.is-current {
+  background: #edf3e8;
+  color: #2f5537;
+  box-shadow: 0 3px 12px #2b483412;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .proof-progress:not(.proof-ready) li[data-state="current"] i {
+    animation: proof-pulse 2s ease-out 2;
+  }
+  @keyframes proof-pulse {
+    from {
+      box-shadow: 0 0 0 0 #557d5d55;
+    }
+    to {
+      box-shadow: 0 0 0 6px #557d5d00;
+    }
+  }
+  .proof-pair,
+  .proof-canvas,
+  .proof-pair img,
+  .proof-ready {
+    animation: proof-arrive 200ms ease-out;
+  }
+  @keyframes proof-arrive {
+    from {
+      opacity: 0.7;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .proof-choices button {
+    transition:
+      transform 160ms ease,
+      background 160ms ease,
+      border-color 160ms ease;
+  }
+  .proof-choices button:active {
+    transform: scale(0.975);
+  }
+  .proof-choices button.is-current svg {
+    animation: proof-mark 220ms ease-out;
+  }
+  @keyframes proof-mark {
+    from {
+      opacity: 0.5;
+      transform: scale(0.76);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+@media (max-width: 500px) {
+  .proof-progress {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 12px;
+  }
+  .proof-toolbar {
+    align-items: flex-start;
+  }
+  .proof-modes button {
+    padding: 4px 7px;
+    font-size: 12px;
+  }
+}

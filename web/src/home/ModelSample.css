@@ -1,0 +1,219 @@
+.ms-modal {
+  width: min(740px, calc(100vw - 32px));
+  max-width: none;
+  max-height: 94dvh;
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  color: #344738;
+  border: 1px solid #e4e0d3;
+  border-radius: 20px;
+  background: #faf8f1;
+  box-shadow: 0 18px 70px #1520195e;
+}
+.ms-modal::backdrop {
+  background: rgb(27 37 31 / 72%);
+}
+.ms-panel {
+  padding: 23px 24px 16px;
+}
+.ms-header,
+.ms-actions,
+.ms-foot,
+.ms-tools,
+.ms-hint {
+  display: flex;
+  align-items: center;
+}
+.ms-header,
+.ms-actions,
+.ms-foot {
+  justify-content: space-between;
+  gap: 12px;
+}
+.ms-header {
+  padding: 0 2px 16px;
+}
+.ms-header h2 {
+  margin: 0;
+  font: 650 clamp(24px, 3vw, 31px)/1.2 var(--serif);
+  letter-spacing: 0.035em;
+}
+.ms-header p {
+  margin-top: 7px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: #68715e;
+}
+.ms-view {
+  position: relative;
+  isolation: isolate;
+  height: clamp(210px, 51dvh, 465px);
+  overflow: hidden;
+  border: 1px solid #cdd0bd;
+  border-bottom: 0;
+  border-radius: 13px 13px 0 0;
+  background: var(--sample-backdrop);
+}
+.ms-stage,
+.ms-stage model-viewer,
+.ms-fallback,
+.ms-fallback img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.ms-stage model-viewer {
+  --poster-color: transparent;
+  --progress-bar-color: #7b8b69;
+  --progress-bar-height: 2px;
+}
+.ms-fallback {
+  display: grid;
+  place-items: center;
+  background: inherit;
+}
+.ms-fallback img {
+  left: 50%;
+  right: auto;
+  width: auto;
+  max-width: none;
+  transform: translateX(-50%);
+}
+.ms-fallback > div {
+  position: relative;
+  align-self: end;
+  justify-self: center;
+  max-width: calc(100% - 20px);
+  padding: 5px 11px;
+  border-radius: 10px;
+  background: #fffdf4ed;
+  margin: 8px;
+  text-align: center;
+  color: #465447;
+  font-size: 12px;
+}
+.ms-fallback button {
+  padding: 5px 8px;
+  background: transparent;
+  color: #354d38;
+  border: 0;
+  text-decoration: underline;
+}
+.ms-actions {
+  min-height: 53px;
+  padding: 6px 10px 6px 14px;
+  border: 1px solid #d8dacb;
+  border-radius: 0 0 13px 13px;
+  background: #eceedf;
+}
+.ms-hint {
+  margin: 0;
+  gap: 7px;
+  color: #56644e;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.ms-tools {
+  margin-left: auto;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.ms-icon,
+.ms-tools button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: 1px solid #ced3c2;
+  border-radius: 22px;
+  background: #fafaf3;
+  color: #3b513d;
+  font-size: 13px;
+}
+.ms-header .ms-icon,
+.ms-tools .ms-icon {
+  width: 38px;
+  padding: 0;
+}
+.ms-header .ms-icon {
+  align-self: flex-start;
+}
+.ms-tools button[aria-pressed="true"],
+.ms-tools button:hover,
+.ms-header button:hover {
+  background: #e2eadb;
+  border-color: #b3c0a8;
+}
+.ms-foot {
+  justify-content: flex-end;
+  padding: 15px 1px 0;
+}
+@media (max-width: 540px) {
+  .ms-modal {
+    width: calc(100vw - 20px);
+    border-radius: 14px;
+  }
+  .ms-panel {
+    padding: 16px 12px 12px;
+  }
+  .ms-header {
+    padding: 0 2px 12px;
+  }
+  .ms-view {
+    height: clamp(180px, 44dvh, 360px);
+  }
+  .ms-actions {
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 5px;
+  }
+  .ms-tools {
+    margin: 0;
+  }
+  .ms-foot {
+    gap: 6px;
+    padding-top: 12px;
+  }
+  .ms-foot .btn {
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+@media (max-width: 350px) {
+  .ms-foot {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ms-modal[open] {
+    animation: ms-open 0.22s ease-out;
+  }
+  .ms-modal[open]::backdrop {
+    animation: ms-backdrop 0.18s ease-out;
+  }
+}
+@keyframes ms-open {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes ms-backdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

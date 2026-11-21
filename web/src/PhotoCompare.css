@@ -1,0 +1,117 @@
+.photo-compare {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 16px;
+  background: #edece4;
+  user-select: none;
+}
+
+.photo-compare-frame {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  background: inherit;
+  pointer-events: none;
+}
+
+.photo-compare-frame > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: var(--compare-fit);
+  object-position: var(--compare-position);
+}
+
+.photo-compare-before {
+  clip-path: inset(0 calc(100% - var(--compare-split)) 0 0);
+}
+
+.photo-compare-frame > span {
+  position: absolute;
+  z-index: 1;
+  bottom: 13px;
+  padding: 5px 10px;
+  border-radius: 100px;
+  color: #fff;
+  background: rgb(34 44 33 / 78%);
+  font:
+    600 12px/1.5 "PingFang SC",
+    "Microsoft YaHei",
+    sans-serif;
+}
+
+.photo-compare-before > span {
+  left: 13px;
+}
+.photo-compare-after > span {
+  right: 13px;
+}
+
+.photo-compare-range {
+  appearance: none;
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  opacity: 0;
+  cursor: ew-resize;
+  touch-action: pan-y;
+  direction: ltr;
+}
+
+/* A narrow invisible native thumb keeps its value aligned with the divider. */
+.photo-compare-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 1px;
+  height: 44px;
+}
+.photo-compare-range::-moz-range-thumb {
+  width: 1px;
+  height: 44px;
+  border: 0;
+}
+
+.photo-compare-rule,
+.photo-compare-knob {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+.photo-compare-rule {
+  left: var(--compare-split);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: #fffcf3;
+  box-shadow: 0 0 10px #29382866;
+}
+.photo-compare-knob {
+  top: 50%;
+  left: clamp(20px, var(--compare-split), calc(100% - 20px));
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: #fffdf4;
+  color: #34533c;
+  box-shadow: 0 2px 14px #20332342;
+  transform: translate(-50%, -50%);
+}
+.photo-compare-range:focus-visible ~ .photo-compare-knob {
+  outline: 3px solid #33583b;
+  outline-offset: 3px;
+}
+.photo-compare-range:active ~ .photo-compare-knob {
+  color: #fffef8;
+  background: #365841;
+}

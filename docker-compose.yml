@@ -1,0 +1,53 @@
+name: tail-journal
+services:
+  app:
+    build: .
+    image: tail-journal:local
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PET_HTTP_PORT:-8000}:8000"
+    volumes:
+      - pet-data:/var/lib/pet-studio
+    depends_on:
+      db:
+        condition: service_healthy
+        required: false
+    environment:
+      PET_DATA_DIR: /var/lib/pet-studio
+      PET_PUBLIC_URL: "${PET_PUBLIC_URL:-http://localhost:8000}"
+      PET_IMAGE_MODE: "${PET_IMAGE_MODE:-demo}"
+      PET_MODEL_MODE: "${PET_MODEL_MODE:-demo}"
+      PET_PAYMENT_MODE: "${PET_PAYMENT_MODE:-demo}"
+      DATABASE_URL: "${DATABASE_URL:-}"
+      DASHSCOPE_API_KEY: "${DASHSCOPE_API_KEY:-}"
+      DASHSCOPE_BASE_URL: "${DASHSCOPE_BASE_URL:-https://dashscope.aliyuncs.com}"
+      QWEN_IMAGE_MODEL: "${QWEN_IMAGE_MODEL:-qwen-image-2.1-turbo}"
+      FAL_KEY: "${FAL_KEY:-}"
+      STRIPE_SECRET_KEY: "${STRIPE_SECRET_KEY:-}"
+      STRIPE_WEBHOOK_SECRET: "${STRIPE_WEBHOOK_SECRET:-}"
+      PET_S3_BUCKET: "${PET_S3_BUCKET:-}"
+      PET_S3_ENDPOINT: "${PET_S3_ENDPOINT:-}"
+      PET_S3_REGION: "${PET_S3_REGION:-us-east-1}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
+      AWS_SESSION_TOKEN: "${AWS_SESSION_TOKEN:-}"
+      FORWARDED_ALLOW_IPS: "${FORWARDED_ALLOW_IPS:-127.0.0.1}"
+  db:
+    image: postgres:16-bookworm
+    profiles: [postgres]
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: petstudio
+      POSTGRES_DB: petstudio
+      POSTGRES_PASSWORD: "${PET_POSTGRES_PASSWORD:-}"
+    volumes:
+      - pet-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U petstudio -d petstudio"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+volumes:
+  pet-data:
+  pet-postgres:
