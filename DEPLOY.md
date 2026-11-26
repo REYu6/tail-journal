@@ -85,3 +85,22 @@ docker compose -p tail-journal-restore run -T --rm --no-deps app python -c 'impo
 ```
 
 PostgreSQL 用新项目启动空数据库，使用 `pg_restore --no-owner --exit-on-error -U petstudio -d petstudio` 将 `petstudio.pgcustom` 恢复到该库。新实例用独立端口和演示支付验证一份宠物档案、一个购买记录与实际下载，再决定是否把域名指向新实例。
+
+## 两节点网络课设
+
+在项目根目录运行以下命令。协调器、节点 A 和节点 B 使用同一个应用镜像，各自运行在独立容器中。节点通过协调器的私有 HTTP 接口取文件并上传结果。存储和数据库仅由协调器访问。
+
+```sh
+export PET_NODE_TOKEN="$(openssl rand -hex 32)"
+docker compose -f docker-compose.yml -f compose.network.yml up --build -d --wait
+```
+
+同一部署的节点和协调器使用相同的 `PET_NODE_TOKEN`。重新部署时可以从自己的私有环境配置加载该值。若是新数据库，使用管理命令创建后台账号：
+
+```sh
+docker compose exec app python -m server.manage create-user --email admin@example.org --role admin
+```
+
+打开管理后台的「节点调度」，等两台节点显示在线。用主人账号上传照片并支付一笔演示建模订单，即可观察工作节点领取任务，交付结果继续进入原有的看样、质检流程。故障演示时可用 `docker compose -f docker-compose.yml -f compose.network.yml stop worker-a` 停止节点 A，用同一命令的 `start worker-a` 子命令恢复。已领取的任务在租约失效后方可接管，仍在排队的任务会根据在线节点重新分配。
+
+跨主机运行时，将协调器部署在各节点可达的 HTTPS 地址。协调器环境设置 `PET_DISTRIBUTED=1` 和 `PET_NODE_TOKEN`。各工作机安装项目 Python 依赖后，设置相同的节点令牌、唯一的 `PET_NODE_ID` 和 `PET_COORDINATOR_URL`，运行 `python -m server.processing_node`。如使用反向代理，允许 `PUT /api/processing/tasks/{job_id}/result` 上传最大 200 MiB 的模型结果。回到单机模式前，在后台确认当前分布式任务已处理完毕。实验脚本、指标定义和样例数据见[网络实验说明](docs/NETWORK_LAB.md)。

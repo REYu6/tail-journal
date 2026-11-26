@@ -628,3 +628,26 @@
   color: #6d776a;
   margin-top: 13px;
 }
+
+.sched-controls, .sched-nodes article header, .sched-nodes article strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sched-controls { flex-wrap: wrap; justify-content: space-between; margin: 16px 0; font-size: 14px; }
+.sched-controls select { border: 1px solid var(--bd); border-radius: 7px; padding: 6px; color: inherit; }
+.sched-nodes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 225px), 1fr)); gap: 12px; }
+.sched-nodes article { background: #f4f6ef; border-radius: 10px; padding: 14px; min-width: 0; }
+.sched-nodes article header { justify-content: space-between; overflow-wrap: anywhere; }
+.sched-nodes article header span { font-size: 12px; white-space: nowrap; }
+.sched-online { color: #3b6f44; }
+.sched-nodes dl { display: grid; grid-template-columns: auto 1fr; gap: 7px 12px; margin: 14px 0 0; font-size: 13px; }
+.sched-nodes dd { text-align: right; margin: 0; }
+.sched-table { max-width: 100%; overflow: auto; }
+.sched-table table { border-collapse: collapse; width: 100%; min-width: 490px; font-size: 13px; }
+.sched-table th, .sched-table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--bd); }
+.sched-table th { color: #596b58; }
+.sched-table small, .sched-events small { display: block; line-height: 1.5; color: #606f60; }
+.sched-events { padding: 0; list-style: none; max-height: 26rem; overflow: auto; }
+.sched-events li { display: flex; align-items: baseline; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--bd); font-size: 13px; }
+.sched-events time { font-variant-numeric: tabular-nums; color: #657460; }

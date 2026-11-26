@@ -13,6 +13,7 @@ from pydantic import Field
 
 from .commerce import router as commerce_router
 from .administration import router as admin_router
+from .processing_api import router as processing_router
 from .access import COOKIE, Body, Revision, authenticated, current, session
 from . import storage, worker
 from .db import database, initialize, log, now, pack, password_hash, setting, uid, valid_password
@@ -56,7 +57,12 @@ async def same_origin(request, call_next):
     length = request.headers.get("content-length", "0")
     if not length.isascii() or not length.isdigit() or len(length) > 20:
         return JSONResponse({"detail": "无效请求"}, status_code=400)
-    if request.url.path.startswith("/api/") and int(length) > 12 * 1024 * 1024:
+    model_result = request.method == "PUT" and re.fullmatch(
+        r"/api/processing/tasks/[^/]+/result", request.url.path
+    )
+    if model_result and int(length) > 200 * 1024 * 1024:
+        return JSONResponse({"detail": "模型结果超过 200 MiB"}, status_code=413)
+    if not model_result and request.url.path.startswith("/api/") and int(length) > 12 * 1024 * 1024:
         return JSONResponse({"detail": "请使用小于 10 MB 的照片"}, status_code=413)
     result = await call_next(request)
     if request.url.path.startswith("/api/"):
@@ -389,6 +395,7 @@ def revise_work(ident: str, b: Revision, user=Depends(authenticated)):
 
 app.include_router(commerce_router)
 app.include_router(admin_router)
+app.include_router(processing_router)
 
 
 @app.get("/api/media/{kind}/{ident}")

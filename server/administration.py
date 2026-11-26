@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from pydantic import Field
 
-from . import providers, storage
+from . import providers, scheduler, storage
 from .access import Body, admin, staff
 from .db import database, log, now, pack, setting, uid
 from .domain import fail, finish_model_if_ready, modes, order_view, pet_view, public_user, work_view
@@ -47,6 +47,23 @@ class Settings(Body):
 
 class Role(Body):
     role: str
+
+
+class SchedulingPolicy(Body):
+    policy: str = Field(pattern=r"^(adaptive|round_robin|shortest_queue)$")
+
+
+@router.get("/scheduler")
+def scheduler_status(user=Depends(staff)):
+    return scheduler.snapshot()
+
+
+@router.post("/scheduler/policy")
+def change_policy(body: SchedulingPolicy, user=Depends(admin)):
+    scheduler.set_policy(body.policy)
+    with database(True) as db:
+        log(db, user["id"], "scheduler_policy", note=body.policy)
+    return {"policy": body.policy}
 
 
 def get_order(db, ident):
@@ -261,6 +278,11 @@ def resume(db, job, b, user):
         fail(409, "此任务无需恢复")
     if job["kind"] == "model" and get_order(db, job["target_id"])["payment_status"] != "paid":
         fail(409, "该订单已停止制作")
+    if job["stage"] == "postprocess":
+        if not scheduler.retry(db, job["id"]):
+            fail(409, "任务当前无法重新分配")
+        log(db, user["id"], "postprocess_retry", job["id"], b.note)
+        return
     external = job["external_id"]
     outputs = job["outputs"]
     if b.external_id:

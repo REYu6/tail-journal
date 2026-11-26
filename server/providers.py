@@ -184,8 +184,9 @@ def submit_model(kind: str, image_keys: list[str], prompt: str, style: str = "",
                 _demo_portrait(image_keys[0], style, prompt, i), "jpg")} for i in range(count)]
         else:
             glb, stl = demo_mesh()
-            outputs = [{"kind": "glb", "key": storage.put(glb, "glb")},
-                       {"kind": "stl", "key": storage.put(stl, "stl")}]
+            outputs = [{"kind": "glb", "key": storage.put(glb, "glb"), "bytes": len(glb)}]
+            if os.getenv("PET_DISTRIBUTED") != "1":
+                outputs.append({"kind": "stl", "key": storage.put(stl, "stl")})
         return _receipt("demo", {"kind": kind, "outputs": outputs})
 
     photos = [storage.source_image(key) for key in image_keys]
@@ -230,7 +231,7 @@ def _file_url(value):
     return value.get("url") if isinstance(value, dict) else value
 
 
-def poll_model(kind: str, task_id: str) -> dict:
+def poll_model(kind: str, task_id: str, *, defer_conversion: bool = False) -> dict:
     provider, sep, remote = task_id.partition(":")
     if provider == "demo":
         _, job = _receipt_detail(task_id)
@@ -284,11 +285,11 @@ def poll_model(kind: str, task_id: str) -> dict:
         raise ProviderError("建模结果不是有效的 GLB 文件")
     # STL is optional in Meshy's response. A local scene export avoids a second
     # generation charge and gives the reviewer the exact approved geometry.
-    printable = _download(stl, domains, 200 * 1024 * 1024) if stl else stl_from_glb(data)
-    return {"status": "succeeded", "outputs": [
-        {"kind": "glb", "key": storage.put(data, "glb")},
-        {"kind": "stl", "key": storage.put(printable, "stl")},
-    ]}
+    outputs = [{"kind": "glb", "key": storage.put(data, "glb"), "bytes": len(data)}]
+    if stl or not defer_conversion:
+        printable = _download(stl, domains, 200 * 1024 * 1024) if stl else stl_from_glb(data)
+        outputs.append({"kind": "stl", "key": storage.put(printable, "stl")})
+    return {"status": "succeeded", "outputs": outputs}
 
 
 

@@ -1,0 +1,32 @@
+# Overlay for the two-node course deployment.
+x-processor: &processor
+  image: tail-journal:local
+  pull_policy: never
+  init: true
+  restart: unless-stopped
+  command: ["python", "-m", "server.processing_node"]
+  depends_on:
+    app:
+      condition: service_healthy
+  healthcheck:
+    disable: true
+
+x-node-environment: &node-environment
+  PET_COORDINATOR_URL: http://app:8000
+  PET_NODE_TOKEN: ${PET_NODE_TOKEN:?Set PET_NODE_TOKEN for the coordinator and workers}
+
+services:
+  app:
+    environment:
+      PET_DISTRIBUTED: "1"
+      PET_NODE_TOKEN: ${PET_NODE_TOKEN:?Set PET_NODE_TOKEN for the coordinator and workers}
+  worker-a:
+    <<: *processor
+    environment:
+      <<: *node-environment
+      PET_NODE_ID: worker-a
+  worker-b:
+    <<: *processor
+    environment:
+      <<: *node-environment
+      PET_NODE_ID: worker-b

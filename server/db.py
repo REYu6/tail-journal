@@ -94,6 +94,23 @@ CREATE TABLE IF NOT EXISTS orders(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,pet_
 CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY,target_id TEXT NOT NULL,kind TEXT NOT NULL,payload TEXT NOT NULL,status TEXT NOT NULL,external_id TEXT NOT NULL DEFAULT '',outputs TEXT NOT NULL DEFAULT '',error TEXT NOT NULL DEFAULT '',stage TEXT NOT NULL DEFAULT 'submit',lease DOUBLE PRECISION NOT NULL DEFAULT 0,attempts INTEGER NOT NULL DEFAULT 0,created_at TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS jobs_target ON jobs(target_id);
 CREATE INDEX IF NOT EXISTS jobs_due ON jobs(status,lease);
+CREATE TABLE IF NOT EXISTS processing_nodes(
+    node_id TEXT PRIMARY KEY,capabilities TEXT NOT NULL,last_seen DOUBLE PRECISION NOT NULL,
+    read_mbps DOUBLE PRECISION NOT NULL,write_mbps DOUBLE PRECISION NOT NULL,compute_s DOUBLE PRECISION NOT NULL
+);
+CREATE TABLE IF NOT EXISTS processing_tasks(
+    job_id TEXT PRIMARY KEY REFERENCES jobs(id),target_id TEXT NOT NULL REFERENCES orders(id),
+    glb_key TEXT NOT NULL,stl_key TEXT NOT NULL,input_bytes BIGINT NOT NULL,status TEXT NOT NULL,
+    node_id TEXT NOT NULL DEFAULT '',epoch INTEGER NOT NULL DEFAULT 0,lease DOUBLE PRECISION NOT NULL DEFAULT 0,
+    failures INTEGER NOT NULL DEFAULT 0,policy TEXT NOT NULL DEFAULT '',estimate_s DOUBLE PRECISION NOT NULL DEFAULT 0,
+    reason TEXT NOT NULL DEFAULT '',created DOUBLE PRECISION NOT NULL,started DOUBLE PRECISION,finished DOUBLE PRECISION
+);
+CREATE INDEX IF NOT EXISTS processing_tasks_due ON processing_tasks(status,created);
+CREATE TABLE IF NOT EXISTS processing_events(
+    id TEXT PRIMARY KEY,job_id TEXT NOT NULL REFERENCES processing_tasks(job_id),
+    node_id TEXT NOT NULL,epoch INTEGER NOT NULL,event TEXT NOT NULL,at DOUBLE PRECISION NOT NULL,detail TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS processing_events_time ON processing_events(at);
 CREATE TABLE IF NOT EXISTS payment_events(id TEXT PRIMARY KEY,order_id TEXT NOT NULL,created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS samples(id TEXT PRIMARY KEY,order_id TEXT NOT NULL UNIQUE,user_id TEXT NOT NULL,specs TEXT NOT NULL,status TEXT NOT NULL,quote INTEGER,note TEXT NOT NULL DEFAULT '',created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS audit(id TEXT PRIMARY KEY,actor TEXT NOT NULL,action TEXT NOT NULL,target TEXT NOT NULL,note TEXT NOT NULL,created_at TEXT NOT NULL);
@@ -174,6 +191,8 @@ def initialize():
             ("styles", DEFAULT_STYLES),
             ("prices", {"portrait": 2990, "model": 9900}),
             ("daily_limit", 6),
+            ("processing_policy", "adaptive"),
+            ("processing_rr_cursor", ""),
         ):
             db.execute(
                 "INSERT INTO settings VALUES (?,?) ON CONFLICT(key) DO NOTHING", (key, pack(val))

@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   ListChecks,
   LockKeyhole,
+  Network,
   RefreshCw,
   Search,
   Settings2,
@@ -39,6 +40,7 @@ import {
 import Settings from "./admin/Settings";
 import Channels from "./admin/Channels";
 import Usage from "./admin/Usage";
+import Scheduler from "./admin/Scheduler";
 import "./admin.css";
 
 type Props = {
@@ -50,6 +52,7 @@ const pages = [
   ["overview", "经营概览", LayoutDashboard],
   ["orders", "订单与售后", ClipboardList],
   ["jobs", "生成任务", Activity],
+  ["scheduler", "节点调度", Network],
   ["samples", "打样报价", Archive],
   ["people", "用户与档案", UsersRound],
   ["channels", "合作渠道", Building2],
@@ -164,7 +167,7 @@ function Dashboard({ user }: { user: SessionUser }) {
     void load();
   }, [load]);
   useEffect(() => {
-    if (tab === "settings") return;
+    if (tab === "settings" || tab === "scheduler") return;
     const timer = window.setInterval(() => {
       if (!document.hidden) void load();
     }, 12000);
@@ -424,10 +427,10 @@ function Dashboard({ user }: { user: SessionUser }) {
             <p>尾巴手记 / 工作室管理</p>
             <h1>{section(tab)}</h1>
           </div>
-          <button disabled={busy} onClick={() => void load()}>
+          {tab !== "scheduler" && <button disabled={busy} onClick={() => void load()}>
             <RefreshCw size={15} />
             刷新
-          </button>
+          </button>}
         </header>
         {err && (
           <p role="alert" className="adm-error">
@@ -495,6 +498,8 @@ function Dashboard({ user }: { user: SessionUser }) {
                 </section>
                 <Usage data={data} />
               </>
+            ) : tab === "scheduler" ? (
+              <Scheduler canChange={admin} />
             ) : tab === "settings" ? (
               <Settings
                 data={data}
@@ -793,6 +798,8 @@ const auditLabel: Record<string, string> = {
   support_resolved: "处理售后留言",
   sample_quoted: "发送打样报价",
   job_reconciled: "恢复已有任务",
+  scheduler_policy: "调整调度策略",
+  postprocess_retry: "重试模型后处理",
   model_resubmitted: "重新提交生成",
   refund_succeeded: "订单已退款",
   refund_pending: "等待支付退款",

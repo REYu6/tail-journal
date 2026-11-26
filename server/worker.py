@@ -2,9 +2,11 @@
 
 import json
 import logging
+import os
 import time
 
-from . import providers, storage
+from . import providers, scheduler, storage
+from .mesh_files import stl_from_glb
 from .db import database, now, pack, uid
 
 logger = logging.getLogger("pawfolio.jobs")
@@ -29,7 +31,7 @@ def claim():
     t = time.time()
     with database(True) as db:
         row = db.one(
-            """SELECT * FROM jobs WHERE status IN ('queued','running') AND lease<=?
+            """SELECT * FROM jobs WHERE status IN ('queued','running') AND stage!='postprocess' AND lease<=?
                         ORDER BY created_at,id LIMIT 1""",
             (t,),
         )
@@ -75,10 +77,11 @@ def step():
                     (external, ident),
                 )
             return True
+        distributed = job["kind"] == "model" and os.getenv("PET_DISTRIBUTED") == "1"
         if job["outputs"]:
             outputs = json.loads(job["outputs"])
         else:
-            info = providers.poll_model(job["kind"], job["external_id"])
+            info = providers.poll_model(job["kind"], job["external_id"], defer_conversion=distributed)
             if info["status"] == "pending":
                 with database(True) as db:
                     db.execute(
@@ -117,8 +120,17 @@ def step():
                 db.execute("UPDATE jobs SET status='done',lease=0,error='' WHERE id=?", (ident,))
         else:
             keys = {o["kind"]: o["key"] for o in outputs}
-            if not keys.get("glb") or not keys.get("stl"):
+            if not keys.get("glb"):
                 raise ValueError("incomplete model")
+            if distributed:
+                glb = next(o for o in outputs if o["kind"] == "glb")
+                size = glb.get("bytes") or storage.size(glb["key"])
+                with database(True) as db:
+                    scheduler.enqueue(db, ident, job["target_id"], glb["key"], size, keys.get("stl", ""))
+                return True
+            # A persisted GLB may predate switching back to the local processor.
+            if not keys.get("stl"):
+                keys["stl"] = storage.put(stl_from_glb(storage.read(keys["glb"])), "stl")
             with database(True) as db:
                 db.execute(
                     """UPDATE orders SET generation_status='ready',delivery_status='review',preview_key=?,stl_key=?,

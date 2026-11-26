@@ -14,6 +14,7 @@ export const label: Record<string, string> = {
   cancelled: "已取消",
   canceled: "已取消",
   queued: "排队中",
+  assigned: "已分配",
   pending: "待处理",
   running: "处理中",
   processing: "生成中",

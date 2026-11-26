@@ -78,6 +78,14 @@ def read(key: str) -> bytes:
     return (_root() / key).read_bytes()
 
 
+def size(key: str) -> int:
+    _key(key)
+    if _s3_enabled():
+        result = _s3_client().head_object(Bucket=os.environ["PET_S3_BUCKET"], Key=f"private/{key}")
+        return result["ContentLength"]
+    return (_root() / key).stat().st_size
+
+
 def remove(key: str) -> None:
     _key(key)
     if _s3_enabled():
