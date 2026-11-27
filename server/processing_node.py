@@ -4,6 +4,7 @@ import json
 import logging
 import math
 import os
+import random
 import re
 import signal
 import socket
@@ -54,6 +55,10 @@ class Node:
             os.getenv("PET_NODE_HEARTBEAT_SECONDS", "2"), 0.05
         )
         self.poll_interval = number(os.getenv("PET_NODE_POLL_SECONDS", "0.35"), 0.02)
+        self.max_idle_poll_interval = max(
+            self.poll_interval,
+            number(os.getenv("PET_NODE_MAX_IDLE_POLL_SECONDS", "2"), 0.02),
+        )
         self.probe_interval = number(os.getenv("PET_NODE_PROBE_SECONDS", "10"), 0.1)
         self.limit_file = os.getenv("PET_NODE_LIMIT_FILE")
         self.caps = {
@@ -235,6 +240,7 @@ class Node:
         heartbeat_thread = threading.Thread(target=self.maintain, daemon=True)
         heartbeat_thread.start()
         probe_due = 0
+        poll_delay = self.poll_interval
         try:
             while not self.stop.is_set():
                 try:
@@ -243,12 +249,16 @@ class Node:
                         probe_due = time.monotonic() + self.probe_interval
                     task = self.json("claim")["task"]
                     if task:
+                        poll_delay = self.poll_interval
                         self.process(task)
                         self.heartbeat()
                         continue
                 except (httpx.HTTPError, ValueError, OSError) as exc:
                     log.warning("协调服务暂不可用：%s", type(exc).__name__)
-                self.stop.wait(self.poll_interval)
+                # Jitter spreads idle requests across nodes without exceeding the cap.
+                earliest = max(self.poll_interval, poll_delay * 0.8)
+                self.stop.wait(random.uniform(earliest, poll_delay))
+                poll_delay = min(poll_delay * 2, self.max_idle_poll_interval)
         finally:
             self.stop.set()
             heartbeat_thread.join()

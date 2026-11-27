@@ -14,6 +14,8 @@ x-processor: &processor
 x-node-environment: &node-environment
   PET_COORDINATOR_URL: http://app:8000
   PET_NODE_TOKEN: ${PET_NODE_TOKEN:?Set PET_NODE_TOKEN for the coordinator and workers}
+  PET_NODE_POLL_SECONDS: ${PET_NODE_POLL_SECONDS:-0.35}
+  PET_NODE_MAX_IDLE_POLL_SECONDS: ${PET_NODE_MAX_IDLE_POLL_SECONDS:-2}
 
 services:
   app:

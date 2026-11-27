@@ -101,6 +101,10 @@ docker compose -f docker-compose.yml -f compose.network.yml up --build -d --wait
 docker compose exec app python -m server.manage create-user --email admin@example.org --role admin
 ```
 
+工作节点无任务时会逐步延长两次领取请求之间的间隔，领到任务后恢复到初始间隔。
+可在两节点 Compose 的环境配置或工作节点进程中设置 `PET_NODE_POLL_SECONDS`（默认 0.35 秒）
+和 `PET_NODE_MAX_IDLE_POLL_SECONDS`（默认 2 秒）。将两个值设为相同可使用固定间隔。
+
 打开管理后台的「节点调度」，等两台节点显示在线。用主人账号上传照片并支付一笔演示建模订单，即可观察工作节点领取任务，交付结果继续进入原有的看样、质检流程。故障演示时可用 `docker compose -f docker-compose.yml -f compose.network.yml stop worker-a` 停止节点 A，用同一命令的 `start worker-a` 子命令恢复。已领取的任务在租约失效后方可接管，仍在排队的任务会根据在线节点重新分配。
 
 跨主机运行时，将协调器部署在各节点可达的 HTTPS 地址。协调器环境设置 `PET_DISTRIBUTED=1` 和 `PET_NODE_TOKEN`。各工作机安装项目 Python 依赖后，设置相同的节点令牌、唯一的 `PET_NODE_ID` 和 `PET_COORDINATOR_URL`，运行 `python -m server.processing_node`。如使用反向代理，允许 `PUT /api/processing/tasks/{job_id}/result` 上传最大 200 MiB 的模型结果。回到单机模式前，在后台确认当前分布式任务已处理完毕。实验脚本、指标定义和样例数据见[网络实验说明](docs/NETWORK_LAB.md)。
